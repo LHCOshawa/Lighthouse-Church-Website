@@ -202,12 +202,12 @@
     <div class="hero-content">
       <span class="eyebrow eyebrow-light hero-anim hero-anim-1">Lighthouse Church · Oshawa, ON</span>
       <div class="clip-line hero-anim hero-anim-2">
-        <h1 class="hero-h1 clip-line-inner gradient-text">Welcome</h1>
+        <h1 class="hero-h1 clip-line-inner" style="color:#ffffff;">Welcome</h1>
       </div>
       <p class="hero-tagline hero-anim hero-anim-3"><em>Making Jesus Centered Disciples</em></p>
       <div class="hero-btns hero-anim hero-anim-4" style="display:flex;gap:3rem;justify-content:center;flex-wrap:wrap;">
         <a href="#times" class="btn btn-ghost" style="min-width:150px;justify-content:center;" aria-label="Jump to service times"><span>Service Times ↓</span></a>
-        <a href="https://www.youtube.com/@lhcoshawa/live" target="_blank" rel="noopener noreferrer" class="btn btn-solid" style="min-width:180px;justify-content:center;" aria-label="Watch Lighthouse Church live on YouTube"><span>&#9654; Watch Live</span></a>
+        <a href="#countdown" class="btn btn-solid" style="min-width:180px;justify-content:center;" aria-label="Watch Lighthouse Church live on YouTube"><span>&#9654; Watch Live</span></a>
       </div>
     </div>
     <div class="hero-scroll-cue" aria-hidden="true">
@@ -217,7 +217,7 @@
   </section>
 
   <!-- ── COUNTDOWN STRIP ── -->
-  <section class="countdown-strip" aria-label="Countdown to next service">
+  <section class="countdown-strip" id="countdown" aria-label="Countdown to next service">
     <div class="countdown-digits" aria-live="polite" aria-atomic="true">
       <div class="cd-block"><div class="cd-num" id="cd-days">00</div><div class="cd-label">Days</div></div>
       <div class="cd-sep" aria-hidden="true">:</div>
@@ -228,6 +228,14 @@
       <div class="cd-block"><div class="cd-num" id="cd-secs">00</div><div class="cd-label">Sec</div></div>
     </div>
     <p class="countdown-next" id="cd-next">Sunday 11:00 AM Service</p>
+    <!-- Live watch button — shown only when a service is currently on -->
+    <div id="cd-live-btn-wrap" style="display:none;margin-top:1.5rem;">
+      <a id="cd-live-btn" href="https://www.youtube.com/@lhcoshawa/live" target="_blank" rel="noopener noreferrer"
+         class="btn btn-solid" style="display:inline-flex;align-items:center;gap:0.6rem;">
+        <span class="live-dot" style="width:8px;height:8px;flex-shrink:0;"></span>
+        <span id="cd-live-label">Watch Sunday 11:00 AM Live</span>
+      </a>
+    </div>
   </section>
 
   <!-- ── EVENTS ── -->

@@ -384,46 +384,48 @@ function isRecurringService(ev) {
   );
 }
 function formatEventHTML(ev, idx) {
-  const MONTHS_LONG  = ['January','February','March','April','May','June','July','August','September','October','November','December'];
   const MONTHS_SHORT = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
-  const DAYS         = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  const DAYS_FULL    = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  const DAYS_SHORT   = ['SUN','MON','TUE','WED','THU','FRI','SAT'];
 
-  const dow   = DAYS[ev.start.getDay()];
+  const dow   = DAYS_FULL[ev.start.getDay()];
+  const dowS  = DAYS_SHORT[ev.start.getDay()];
   const dayN  = ev.start.getDate();
   const monS  = MONTHS_SHORT[ev.start.getMonth()];
+  const yr    = ev.start.getFullYear();
 
-  // IMAGE LOGIC
-  const imgSrc = getEventImage(ev.title);
-
-  const descHTML = ev.description
-    ? `<div class="evt-card-desc">${ev.description}</div>` : '';
+  // Cycle through a few bold B&W accent patterns
+  const patterns = [
+    'radial-gradient(circle at 20% 80%, rgba(255,255,255,0.06) 0%, transparent 55%), linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%)',
+    'radial-gradient(circle at 80% 20%, rgba(255,255,255,0.06) 0%, transparent 55%), linear-gradient(135deg, #111 0%, #0a0a0a 100%)',
+    'radial-gradient(circle at 50% 50%, rgba(255,255,255,0.05) 0%, transparent 60%), linear-gradient(160deg, #141414 0%, #080808 100%)',
+  ];
+  const bg = patterns[idx % patterns.length];
 
   const locHTML = ev.location
-    ? `<span class="evt-card-meta-sep">·</span><span>${ev.location}</span>` : '';
+    ? `<span class="evt-minimal-loc"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>${ev.location}</span>` : '';
 
   return `
-  <div class="evt-card" role="article" aria-label="${ev.title} on ${dow} ${monS} ${dayN}">
-    <div class="evt-card-bg" style="background-image:url('${imgSrc}')"></div>
-    <div class="evt-card-gradient"></div>
-    <div class="evt-card-day-num" aria-hidden="true">${dayN}</div>
-    <div class="evt-card-glow"></div>
-
-    <div class="evt-card-glass">
-      <div class="evt-card-label">
-        <span class="evt-card-month">${monS} ${ev.start.getFullYear()}</span>
-        <span class="evt-card-dot"></span>
-        <span class="evt-card-dow">${dow}</span>
-      </div>
-
-      <div class="evt-card-title">${ev.title}</div>
-
-      <div class="evt-card-meta">
+  <div class="evt-card evt-card-minimal" role="article" aria-label="${ev.title} — ${dow} ${monS} ${dayN}" style="background:${bg};">
+    <!-- Large ghost date number -->
+    <div class="evt-ghost-day" aria-hidden="true">${dayN}</div>
+    <!-- Top badge row -->
+    <div class="evt-minimal-top">
+      <span class="evt-minimal-dow">${dowS}</span>
+      <span class="evt-minimal-sep" aria-hidden="true">·</span>
+      <span class="evt-minimal-mon">${monS} ${yr}</span>
+    </div>
+    <!-- Title -->
+    <div class="evt-minimal-body">
+      <h3 class="evt-minimal-title">${ev.title}</h3>
+      <div class="evt-minimal-meta">
         <span>${ev.time}</span>
         ${locHTML}
       </div>
-
-      ${descHTML}
+      ${ev.description ? `<p class="evt-minimal-desc">${ev.description}</p>` : ''}
     </div>
+    <!-- Bottom accent line -->
+    <div class="evt-minimal-line" aria-hidden="true"></div>
   </div>`;
 }
 
@@ -736,6 +738,8 @@ function initHeroParticles() {
     const cdMins = document.getElementById('cd-mins');
     const cdSecs = document.getElementById('cd-secs');
     const cdNext = document.getElementById('cd-next');
+    const cdLiveBtnWrap = document.getElementById('cd-live-btn-wrap');
+    const cdLiveLabel   = document.getElementById('cd-live-label');
     if (!cdDays) return;
 
     const prev = { d: null, h: null, mi: null, s: null };
@@ -753,9 +757,32 @@ function initHeroParticles() {
       }
     }
 
+    // YouTube live links per service
+    const SERVICE_YOUTUBE = {
+      'Sunday 11:00 AM Service': 'https://www.youtube.com/@lhcoshawa/live',
+      'Sunday 7:00 PM Service':  'https://www.youtube.com/@lhcoshawa/live',
+      'Wednesday 7:30 PM Service': 'https://www.youtube.com/@lhcoshawa/live',
+    };
+
     function tick() {
       const { service, msToNext } = getNextService();
-      if (cdNext) cdNext.textContent = service.label;
+      const live = isLive();
+
+      if (cdNext) {
+        cdNext.textContent = live ? '🔴 ' + service.label + ' — On Now' : service.label;
+      }
+
+      if (cdLiveBtnWrap) {
+        if (live) {
+          cdLiveBtnWrap.style.display = 'block';
+          if (cdLiveLabel) cdLiveLabel.textContent = 'Watch ' + service.label;
+          const btn = document.getElementById('cd-live-btn');
+          if (btn) btn.href = SERVICE_YOUTUBE[service.label] || 'https://www.youtube.com/@lhcoshawa/live';
+        } else {
+          cdLiveBtnWrap.style.display = 'none';
+        }
+      }
+
       let rem = Math.floor(msToNext / 1000);
       const d  = Math.floor(rem / 86400); rem %= 86400;
       const h  = Math.floor(rem / 3600);  rem %= 3600;
