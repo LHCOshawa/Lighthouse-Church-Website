@@ -316,7 +316,7 @@ document.querySelectorAll('[data-copy]').forEach(btn => {
 });
 
 /* ── ICS PARSER & EVENTS ────────────────────────────────────── */
-const ICS_URL = 'https://calendar.google.com/calendar/ical/9104549d30365e435d95dcef73e34981c01eb3638d988038d40ca0fd4284cb57%40group.calendar.google.com/private-7ada65396fd2886b86bebc41587dab09/basic.ics';
+const ICS_URL = 'https://raw.githubusercontent.com/LHCOshawa/Website/main/basic.ics';
 
 const FALLBACK_EVENTS = [
   { title: 'Beauty & Grace', start: new Date(2024, 11, 13), time: '12:00 AM', location: 'Church Sanctuary', description: '' },
