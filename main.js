@@ -425,6 +425,21 @@ function isRecurringService(ev) {
     t.includes('worship') */
   );
 }
+/* ── ADD-TO-GCAL LINK BUILDER ────────────────────────────────── */
+function buildGcalLink(ev) {
+  const pad = n => String(n).padStart(2, '0');
+  const fmt = d => `${d.getFullYear()}${pad(d.getMonth()+1)}${pad(d.getDate())}T${pad(d.getHours())}${pad(d.getMinutes())}00`;
+  const endDate = new Date(ev.start.getTime() + 2 * 60 * 60 * 1000);
+  const params = new URLSearchParams({
+    action: 'TEMPLATE',
+    text: ev.title,
+    dates: `${fmt(ev.start)}/${fmt(endDate)}`,
+    location: ev.location || 'Lighthouse Church, 555 Wentworth St E #3-4, Oshawa, ON L1H 3V8',
+    details: ev.description || 'Join us at Lighthouse Church Oshawa. Visit lhcoshawa.ca for details.'
+  });
+  return `https://calendar.google.com/calendar/render?${params.toString()}`;
+}
+
 function formatEventHTML(ev, idx) {
   const MONTHS_SHORT = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
   const DAYS_FULL    = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
@@ -435,39 +450,35 @@ function formatEventHTML(ev, idx) {
   const dayN  = ev.start.getDate();
   const monS  = MONTHS_SHORT[ev.start.getMonth()];
   const yr    = ev.start.getFullYear();
-
-  // Cycle through a few bold B&W accent patterns
-  const patterns = [
-    'radial-gradient(circle at 20% 80%, rgba(255,255,255,0.06) 0%, transparent 55%), linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%)',
-    'radial-gradient(circle at 80% 20%, rgba(255,255,255,0.06) 0%, transparent 55%), linear-gradient(135deg, #111 0%, #0a0a0a 100%)',
-    'radial-gradient(circle at 50% 50%, rgba(255,255,255,0.05) 0%, transparent 60%), linear-gradient(160deg, #141414 0%, #080808 100%)',
-  ];
-  const bg = patterns[idx % patterns.length];
+  const img   = getEventImage(ev.title);
+  const gcalLink = buildGcalLink(ev);
 
   const locHTML = ev.location
-    ? `<span class="evt-minimal-loc"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>${ev.location}</span>` : '';
+    ? `<span class="evt-card-meta-sep">·</span><span class="evt-card-meta-loc"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>${ev.location}</span>` : '';
 
   return `
-  <div class="evt-card evt-card-minimal" role="article" aria-label="${ev.title} — ${dow} ${monS} ${dayN}" style="background:${bg};">
-    <!-- Large ghost date number -->
-    <div class="evt-ghost-day" aria-hidden="true">${dayN}</div>
-    <!-- Top badge row -->
-    <div class="evt-minimal-top">
-      <span class="evt-minimal-dow">${dowS}</span>
-      <span class="evt-minimal-sep" aria-hidden="true">·</span>
-      <span class="evt-minimal-mon">${monS} ${yr}</span>
-    </div>
-    <!-- Title -->
-    <div class="evt-minimal-body">
-      <h3 class="evt-minimal-title">${ev.title}</h3>
-      <div class="evt-minimal-meta">
+  <div class="evt-card" role="article" aria-label="${ev.title} — ${dow} ${monS} ${dayN}">
+    <div class="evt-card-bg" style="background-image:url('${img}')"></div>
+    <div class="evt-card-gradient"></div>
+    <div class="evt-card-glow"></div>
+    <div class="evt-card-day-num" aria-hidden="true">${dayN}</div>
+    <div class="evt-card-glass">
+      <div class="evt-card-label">
+        <span class="evt-card-month">${monS} ${yr}</span>
+        <span class="evt-card-dot"></span>
+        <span class="evt-card-dow">${dowS}</span>
+      </div>
+      <h3 class="evt-card-title">${ev.title}</h3>
+      <div class="evt-card-meta">
         <span>${ev.time}</span>
         ${locHTML}
       </div>
-      ${ev.description ? `<p class="evt-minimal-desc">${ev.description}</p>` : ''}
+      ${ev.description ? `<p class="evt-card-desc">${ev.description}</p>` : ''}
+      <a href="${gcalLink}" target="_blank" rel="noopener noreferrer" class="evt-add-cal" aria-label="Add ${ev.title} to Google Calendar">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        Add to Calendar
+      </a>
     </div>
-    <!-- Bottom accent line -->
-    <div class="evt-minimal-line" aria-hidden="true"></div>
   </div>`;
 }
 
@@ -616,12 +627,17 @@ function injectCalendarEmbed(section, autoOpen) {
   toggleWrap.className = 'gcal-toggle-wrap';
   const isOpen = !!autoOpen;
   toggleWrap.innerHTML =
-    '<button class="btn btn-ghost gcal-toggle-btn" aria-expanded="' + isOpen + '" aria-controls="gcal-embed-wrap">' +
-      '<span class="gcal-toggle-label">' + (isOpen ? 'Hide Calendar' : 'View Full Calendar') + '</span>' +
-      '<svg class="gcal-toggle-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" style="transform:' + (isOpen ? 'rotate(180deg)' : '') + '"><path d="M6 9l6 6 6-6"/></svg>' +
+    '<div class="gcal-divider"><span class="gcal-divider-line"></span>' +
+    '<button class="gcal-toggle-btn" aria-expanded="' + isOpen + '" aria-controls="gcal-embed-wrap">' +
+      '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>' +
+      '<span class="gcal-toggle-label">' + (isOpen ? 'Hide Full Calendar' : 'Full Calendar') + '</span>' +
+      '<svg class="gcal-toggle-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true" style="transform:' + (isOpen ? 'rotate(180deg)' : '') + '"><path d="M6 9l6 6 6-6"/></svg>' +
     '</button>' +
+    '<span class="gcal-divider-line"></span></div>' +
     '<div id="gcal-embed-wrap" class="gcal-embed-wrap" ' + (isOpen ? '' : 'hidden') + '>' +
-      '<iframe src="' + GCAL_EMBED + '" style="border:0" width="100%" height="600" frameborder="0" scrolling="no" loading="lazy" title="Lighthouse Church — Full Event Calendar"></iframe>' +
+      '<div class="gcal-embed-inner">' +
+        '<iframe src="' + GCAL_EMBED + '" style="border:0;display:block;" width="100%" height="640" frameborder="0" scrolling="no" loading="lazy" title="Lighthouse Church — Full Event Calendar"></iframe>' +
+      '</div>' +
     '</div>';
   section.appendChild(toggleWrap);
   const btn   = toggleWrap.querySelector('.gcal-toggle-btn');
@@ -630,7 +646,7 @@ function injectCalendarEmbed(section, autoOpen) {
     const open = embed.hidden;
     embed.hidden = !open;
     btn.setAttribute('aria-expanded', String(open));
-    btn.querySelector('.gcal-toggle-label').textContent = open ? 'Hide Calendar' : 'View Full Calendar';
+    btn.querySelector('.gcal-toggle-label').textContent = open ? 'Hide Full Calendar' : 'Full Calendar';
     btn.querySelector('.gcal-toggle-chevron').style.transform = open ? 'rotate(180deg)' : '';
     if (open) embed.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   });
