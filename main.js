@@ -316,7 +316,10 @@ document.querySelectorAll('[data-copy]').forEach(btn => {
 });
 
 /* ── ICS PARSER & EVENTS ────────────────────────────────────── */
-const ICS_URL = 'https://raw.githubusercontent.com/LHCOshawa/Website/main/basic.ics';
+// Google Calendar public ICS feed — derived from the calendar embed src
+const GCAL_ID  = 'OTEwNDU0OWQzMDM2NWU0MzVkOTVkY2VmNzNlMzQ5ODFjMDFlYjM2MzhkOTg4MDM4ZDQwY2EwZmQ0Mjg0Y2I1N0Bncm91cC5jYWxlbmRhci5nb29nbGUuY29t';
+const ICS_URL  = `https://calendar.google.com/calendar/ical/${GCAL_ID}/public/basic.ics`;
+const GCAL_EMBED = `https://calendar.google.com/calendar/embed?src=${GCAL_ID}&ctz=America%2FToronto`;
 
 const FALLBACK_EVENTS = [
   { title: 'Beauty & Grace', start: new Date(2024, 11, 13), time: '12:00 AM', location: 'Church Sanctuary', description: '' },
@@ -328,31 +331,70 @@ const FALLBACK_EVENTS = [
 
 function parseICS(text) {
   const events = [];
-  const blocks = text.split('BEGIN:VEVENT');
+  const now    = new Date();
+  const cutoff = new Date(now.getTime() - 2 * 60 * 60 * 1000); // 2hr grace
+
+  // Unfold ICS continuation lines
+  const unfolded = text.replace(/\r\n[ \t]/g, '').replace(/\n[ \t]/g, '');
+  const blocks = unfolded.split(/BEGIN:VEVENT/);
+
   blocks.slice(1).forEach(block => {
     const get = (key) => {
-      const match = block.match(new RegExp(`${key}[^:]*:([^\\r\\n]+)`));
-      return match ? match[1].trim() : '';
+      const re = new RegExp('(?:^|\\n)' + key + '(?:;[^:]*)?:([^\\r\\n]+)', 'im');
+      const m  = block.match(re);
+      return m ? m[1].trim() : '';
     };
-    const dtRaw = get('DTSTART') || get('DTSTART;VALUE=DATE') || '';
-    let start = null;
-    if (dtRaw) {
-      const y = +dtRaw.slice(0,4), mo = +dtRaw.slice(4,6)-1, d = +dtRaw.slice(6,8);
-      const h = dtRaw.length > 8 ? +dtRaw.slice(9,11) : 0;
-      const mi = dtRaw.length > 8 ? +dtRaw.slice(11,13) : 0;
-      start = new Date(y, mo, d, h, mi);
+
+    function parsedt(raw) {
+      if (!raw) return null;
+      const val = raw.replace(/^[^:]+:/, '').trim();
+      const y = +val.slice(0,4), mo = +val.slice(4,6)-1, d = +val.slice(6,8);
+      const h = val.length > 8 ? +val.slice(9,11) : 0;
+      const mi = val.length > 8 ? +val.slice(11,13) : 0;
+      return new Date(y, mo, d, h, mi);
     }
+
+    const dtstartLine = block.match(/(?:^|\n)DTSTART(?:;[^:\r\n]*)?:([^\r\n]+)/im);
+    const start = dtstartLine ? parsedt(dtstartLine[1].trim()) : null;
     if (!start) return;
-    const title = get('SUMMARY').replace(/\\n/g,' ').replace(/\\,/g,',') || 'Untitled Event';
-    const desc  = get('DESCRIPTION').replace(/\\n/g,' ').replace(/\\,/g,',').slice(0,200);
-    const loc   = get('LOCATION').replace(/\\n/g,' ');
-    const hh = start.getHours(), mm = start.getMinutes();
+
+    const title  = get('SUMMARY').replace(/\\n/g,' ').replace(/\\,/g,',').trim() || 'Untitled Event';
+    const desc   = get('DESCRIPTION').replace(/\\n/g,' ').replace(/\\,/g,',').trim().slice(0,200);
+    const loc    = get('LOCATION').replace(/\\n/g,' ').replace(/\\,/g,',').trim();
+    const rrule  = get('RRULE');
+
+    let eventStart = new Date(start);
+
+    if (rrule) {
+      const freq     = (rrule.match(/FREQ=(\w+)/i)     || [])[1] || '';
+      const interval = +((rrule.match(/INTERVAL=(\d+)/i) || [])[1] || 1);
+      const untilRaw = (rrule.match(/UNTIL=(\d+)/i)     || [])[1] || '';
+      const until    = untilRaw ? parsedt(untilRaw) : null;
+
+      let candidate = new Date(eventStart);
+      let i = 0;
+      while (candidate < cutoff && i++ < 500) {
+        if      (freq === 'WEEKLY')  candidate.setDate(candidate.getDate() + 7 * interval);
+        else if (freq === 'DAILY')   candidate.setDate(candidate.getDate() + interval);
+        else if (freq === 'MONTHLY') candidate.setMonth(candidate.getMonth() + interval);
+        else if (freq === 'YEARLY')  candidate.setFullYear(candidate.getFullYear() + interval);
+        else break;
+      }
+      if (until && candidate > until) return;
+      if (candidate < cutoff) return;
+      eventStart = candidate;
+    } else {
+      if (eventStart < cutoff) return;
+    }
+
+    const hh = eventStart.getHours(), mm = eventStart.getMinutes();
     const ampm = hh >= 12 ? 'PM' : 'AM';
-    const h12 = hh % 12 || 12;
-    const time = `${h12}:${String(mm).padStart(2,'0')} ${ampm}`;
-    events.push({ title, start, time, location: loc, description: desc });
+    const h12  = hh % 12 || 12;
+    const time = h12 + ':' + String(mm).padStart(2,'0') + ' ' + ampm;
+    events.push({ title, start: eventStart, time, location: loc, description: desc });
   });
-  return events.filter(e => e.start >= new Date()).sort((a,b) => a.start - b.start);
+
+  return events.sort((a, b) => a.start - b.start);
 }
 
 
@@ -438,16 +480,26 @@ function emptyEventsHTML() {
   </div>`;
 }
 
+const EVENT_LIMIT = 5; // Show first 5 events, then full calendar
+
 function renderEvents(events, containerId, filter, limit) {
   const container = document.getElementById(containerId);
   if (!container) return;
-let filtered = events.filter(ev => !isRecurringService(ev)); // remove recurring services
-if (filter) {
-  filtered = filtered.filter(filter);
-}
-  const visible = filtered.slice(0, limit || 8);
+
+  let filtered = events.filter(ev => !isRecurringService(ev));
+  if (filter) filtered = filtered.filter(filter);
+
+  const cap     = Math.min(limit || EVENT_LIMIT, EVENT_LIMIT);
+  const visible = filtered.slice(0, cap);
+
   if (!visible.length) { container.innerHTML = emptyEventsHTML(); return; }
+
+  // Render the first 5 cards
   container.innerHTML = visible.map((ev, i) => formatEventHTML(ev, i)).join('');
+
+  // Inject "View Full Calendar" toggle below the cards
+  const section = container.closest('section') || container.parentElement;
+  if (section) injectCalendarEmbed(section, false);
 
   // Only init carousel if this is the main homepage carousel track
   if (containerId === 'events-container') {
@@ -558,11 +610,61 @@ function initEvtCarousel(track) {
   goTo(0);
 }
 
+function injectCalendarEmbed(section, autoOpen) {
+  if (section.querySelector('.gcal-toggle-wrap')) return;
+  const toggleWrap = document.createElement('div');
+  toggleWrap.className = 'gcal-toggle-wrap';
+  const isOpen = !!autoOpen;
+  toggleWrap.innerHTML =
+    '<button class="btn btn-ghost gcal-toggle-btn" aria-expanded="' + isOpen + '" aria-controls="gcal-embed-wrap">' +
+      '<span class="gcal-toggle-label">' + (isOpen ? 'Hide Calendar' : 'View Full Calendar') + '</span>' +
+      '<svg class="gcal-toggle-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" style="transform:' + (isOpen ? 'rotate(180deg)' : '') + '"><path d="M6 9l6 6 6-6"/></svg>' +
+    '</button>' +
+    '<div id="gcal-embed-wrap" class="gcal-embed-wrap" ' + (isOpen ? '' : 'hidden') + '>' +
+      '<iframe src="' + GCAL_EMBED + '" style="border:0" width="100%" height="600" frameborder="0" scrolling="no" loading="lazy" title="Lighthouse Church — Full Event Calendar"></iframe>' +
+    '</div>';
+  section.appendChild(toggleWrap);
+  const btn   = toggleWrap.querySelector('.gcal-toggle-btn');
+  const embed = toggleWrap.querySelector('.gcal-embed-wrap');
+  btn.addEventListener('click', function() {
+    const open = embed.hidden;
+    embed.hidden = !open;
+    btn.setAttribute('aria-expanded', String(open));
+    btn.querySelector('.gcal-toggle-label').textContent = open ? 'Hide Calendar' : 'View Full Calendar';
+    btn.querySelector('.gcal-toggle-chevron').style.transform = open ? 'rotate(180deg)' : '';
+    if (open) embed.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  });
+}
+
+function showCalendarEmbedFallback(containerId) {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+  container.innerHTML = '<div style="text-align:center;padding:1.5rem 0;"><p style="font-size:0.82rem;color:var(--text-2);">View our upcoming events below</p></div>';
+  const section = container.closest('section') || container.parentElement;
+  if (section) injectCalendarEmbed(section, true);
+}
+
 window.fetchAndRenderEvents = function(containerId, filterFn, limit) {
-  fetch(ICS_URL, { mode: 'no-cors' })
-    .then(r => { if (!r.ok && r.type !== 'opaque') throw new Error('no-cors'); return r.text(); })
-    .then(text => { if (!text) throw new Error('empty'); const evs = parseICS(text); renderEvents(evs, containerId, filterFn, limit); })
-    .catch(() => renderEvents(FALLBACK_EVENTS, containerId, filterFn, limit));
+  const proxies = [
+    'https://corsproxy.io/?url=' + encodeURIComponent(ICS_URL),
+    'https://api.allorigins.win/raw?url=' + encodeURIComponent(ICS_URL),
+    'https://thingproxy.freeboard.io/fetch/' + ICS_URL,
+  ];
+
+  function tryProxy(idx) {
+    if (idx >= proxies.length) { showCalendarEmbedFallback(containerId); return; }
+    fetch(proxies[idx])
+      .then(function(r) { if (!r.ok) throw new Error('proxy ' + idx + ' failed'); return r.text(); })
+      .then(function(text) {
+        if (!text || !text.includes('BEGIN:VCALENDAR')) throw new Error('invalid ICS');
+        const evs = parseICS(text);
+        if (!evs.length) { showCalendarEmbedFallback(containerId); return; }
+        renderEvents(evs, containerId, filterFn, limit);
+      })
+      .catch(function() { tryProxy(idx + 1); });
+  }
+
+  tryProxy(0);
 };
 
 /* ── HERO IMAGE LOAD ─────────────────────────────────────────── */

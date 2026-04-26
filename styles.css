@@ -3183,3 +3183,136 @@ html[data-theme="light"] .evt-minimal-line    { background: #080808 !important; 
   to   { opacity: 1; transform: translateY(0); }
 }
 
+
+/* ── FULL CALENDAR TOGGLE ──────────────────────────────────── */
+.gcal-toggle-wrap {
+  margin-top: 2.5rem;
+  text-align: center;
+}
+
+.gcal-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--text-2);
+  padding: 0.9rem 2rem;
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 2px;
+  transition: color 0.25s var(--ease), border-color 0.25s var(--ease), background 0.25s var(--ease);
+  cursor: pointer;
+}
+.gcal-toggle-btn:hover {
+  color: #fff;
+  border-color: rgba(255,255,255,0.4);
+  background: rgba(255,255,255,0.04);
+}
+.gcal-toggle-chevron {
+  transition: transform 0.35s cubic-bezier(0.16,1,0.3,1);
+  flex-shrink: 0;
+}
+
+.gcal-embed-wrap {
+  margin-top: 2rem;
+  border-radius: 4px;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.08);
+  animation: gcalSlideDown 0.45s cubic-bezier(0.16,1,0.3,1) forwards;
+}
+.gcal-embed-wrap[hidden] { display: none; }
+
+@keyframes gcalSlideDown {
+  from { opacity: 0; transform: translateY(-12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Light mode calendar toggle */
+html[data-theme="light"] .gcal-toggle-btn {
+  color: rgba(8,8,8,0.5);
+  border-color: rgba(0,0,0,0.12);
+}
+html[data-theme="light"] .gcal-toggle-btn:hover {
+  color: #080808;
+  border-color: rgba(0,0,0,0.35);
+  background: rgba(0,0,0,0.03);
+}
+html[data-theme="light"] .gcal-embed-wrap {
+  border-color: rgba(0,0,0,0.1);
+}
+
+/* ================================================================
+   FINAL VISUAL FIXES
+   ================================================================ */
+
+/* ── DROPDOWN: ALWAYS BLACK IN LIGHT MODE — HARDCODED ─────────
+   Overrides every previous rule with maximum specificity.
+   Uses html attr selector + element + class + child combinator
+   so no other rule can win without !important on a more specific selector.
+   ─────────────────────────────────────────────────────────────── */
+html[data-theme="light"] #nav .nav-dropdown,
+html[data-theme="light"] #nav .nav-dropdown.open {
+  background-color: #ffffff !important;
+  border-color: rgba(0,0,0,0.10) !important;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.10) !important;
+}
+
+html[data-theme="light"] #nav .nav-dropdown a,
+html[data-theme="light"] #nav .nav-dropdown a:link,
+html[data-theme="light"] #nav .nav-dropdown a:visited,
+html[data-theme="light"] #nav .nav-dropdown a:hover,
+html[data-theme="light"] #nav .nav-dropdown a:focus,
+html[data-theme="light"] #nav .nav-dropdown a:active,
+html[data-theme="light"] #nav .nav-dropdown [role="menuitem"],
+html[data-theme="light"] #nav .nav-dropdown [role="menuitem"]:hover {
+  color: #080808 !important;
+  background-color: transparent !important;
+}
+html[data-theme="light"] #nav .nav-dropdown a:hover,
+html[data-theme="light"] #nav .nav-dropdown a:focus {
+  background-color: rgba(0,0,0,0.04) !important;
+}
+html[data-theme="light"] #nav .nav-dropdown .dd-dash {
+  color: #080808 !important;
+  opacity: 0.35;
+}
+
+/* ── WELCOME: airy light weight + shimmer sweep animation ──────
+   Semi-transparent white so background photo breathes through.
+   Letter-spacing animates from wide → tight on load (elegant reveal).
+   ─────────────────────────────────────────────────────────────── */
+.page-hero .hero-h1.clip-line-inner[style*="color:#ffffff"],
+#main-content .hero-h1.clip-line-inner {
+  color: rgba(255, 255, 255, 0.82) !important;
+  font-weight: 200 !important;
+  letter-spacing: 0.08em !important;
+  animation: welcomeReveal 1.4s cubic-bezier(0.16, 1, 0.3, 1) 0.5s both;
+}
+
+@keyframes welcomeReveal {
+  0%   {
+    opacity: 0;
+    letter-spacing: 0.32em;
+    filter: blur(8px);
+    transform: translateY(12px);
+  }
+  60%  {
+    opacity: 0.9;
+    filter: blur(0);
+  }
+  100% {
+    opacity: 1;
+    letter-spacing: 0.08em;
+    filter: blur(0);
+    transform: translateY(0);
+  }
+}
+
+/* ── EYEBROW LIGHT: make WHITE on hero ──────────────────────── */
+.eyebrow-light {
+  color: rgba(255, 255, 255, 0.92) !important;
+  letter-spacing: 0.35em !important;
+}
+
