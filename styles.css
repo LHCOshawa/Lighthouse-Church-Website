@@ -3174,72 +3174,41 @@ html[data-theme="light"] .evt-minimal-meta    { color: rgba(0,0,0,0.38) !importa
 html[data-theme="light"] .evt-minimal-desc    { color: rgba(0,0,0,0.45) !important; }
 html[data-theme="light"] .evt-minimal-line    { background: #080808 !important; }
 
-/* ── ADD TO CALENDAR LINK ────────────────────────────────────── */
-.evt-add-cal {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.45rem;
-  margin-top: 1.25rem;
-  font-size: 0.6rem;
-  font-weight: 700;
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
-  color: var(--gold);
-  text-decoration: none;
-  opacity: 0;
-  transform: translateY(6px);
-  transition: opacity 0.35s var(--ease), transform 0.35s var(--ease), color 0.2s;
-  pointer-events: none;
+/* ── COUNTDOWN LIVE BUTTON ───────────────────────────────────── */
+#cd-live-btn-wrap {
+  animation: cdLiveFade 0.6s var(--ease) forwards;
 }
-.evt-card:hover .evt-add-cal {
-  opacity: 1;
-  transform: translateY(0);
-  pointer-events: auto;
+@keyframes cdLiveFade {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
-.evt-add-cal:hover { color: #fff; }
-.evt-add-cal svg { flex-shrink: 0; }
 
-/* ── CALENDAR EMBED: DIVIDER + TOGGLE ────────────────────────── */
+
+/* ── FULL CALENDAR TOGGLE ──────────────────────────────────── */
 .gcal-toggle-wrap {
-  margin-top: 3rem;
-  padding: 0 clamp(1.5rem, 5vw, 4rem);
-}
-
-.gcal-divider {
-  display: flex;
-  align-items: center;
-  gap: 1.5rem;
-  margin-bottom: 0;
-}
-
-.gcal-divider-line {
-  flex: 1;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.08), transparent);
+  margin-top: 2.5rem;
+  text-align: center;
 }
 
 .gcal-toggle-btn {
   display: inline-flex;
   align-items: center;
   gap: 0.6rem;
-  font-size: 0.62rem;
+  font-size: 0.72rem;
   font-weight: 700;
-  letter-spacing: 0.25em;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
-  color: rgba(255,255,255,0.35);
-  padding: 0.65rem 1.4rem;
-  border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 100px;
-  background: rgba(255,255,255,0.03);
-  cursor: pointer;
+  color: var(--text-2);
+  padding: 0.9rem 2rem;
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 2px;
   transition: color 0.25s var(--ease), border-color 0.25s var(--ease), background 0.25s var(--ease);
-  white-space: nowrap;
-  flex-shrink: 0;
+  cursor: pointer;
 }
 .gcal-toggle-btn:hover {
-  color: var(--gold);
-  border-color: rgba(201,169,110,0.35);
-  background: rgba(201,169,110,0.05);
+  color: #fff;
+  border-color: rgba(255,255,255,0.4);
+  background: rgba(255,255,255,0.04);
 }
 .gcal-toggle-chevron {
   transition: transform 0.35s cubic-bezier(0.16,1,0.3,1);
@@ -3248,51 +3217,31 @@ html[data-theme="light"] .evt-minimal-line    { background: #080808 !important; 
 
 .gcal-embed-wrap {
   margin-top: 2rem;
-  border-radius: 8px;
+  border-radius: 4px;
   overflow: hidden;
-  border: 1px solid rgba(255,255,255,0.07);
-  animation: gcalSlideDown 0.5s cubic-bezier(0.16,1,0.3,1) forwards;
-  box-shadow: 0 32px 80px rgba(0,0,0,0.45);
+  border: 1px solid rgba(255,255,255,0.08);
+  animation: gcalSlideDown 0.45s cubic-bezier(0.16,1,0.3,1) forwards;
 }
 .gcal-embed-wrap[hidden] { display: none; }
 
-.gcal-embed-inner {
-  position: relative;
-  background: #1a1a2e;
-}
-.gcal-embed-inner::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(180deg, rgba(8,8,8,0.15) 0%, transparent 15%, transparent 85%, rgba(8,8,8,0.1) 100%);
-  pointer-events: none;
-  z-index: 1;
-}
-
 @keyframes gcalSlideDown {
-  from { opacity: 0; transform: translateY(-16px); }
+  from { opacity: 0; transform: translateY(-12px); }
   to   { opacity: 1; transform: translateY(0); }
 }
 
 /* Light mode calendar toggle */
 html[data-theme="light"] .gcal-toggle-btn {
-  color: rgba(8,8,8,0.4);
-  border-color: rgba(0,0,0,0.1);
-  background: rgba(0,0,0,0.02);
+  color: rgba(8,8,8,0.5);
+  border-color: rgba(0,0,0,0.12);
 }
 html[data-theme="light"] .gcal-toggle-btn:hover {
-  color: var(--gold);
-  border-color: rgba(201,169,110,0.4);
-  background: rgba(201,169,110,0.06);
+  color: #080808;
+  border-color: rgba(0,0,0,0.35);
+  background: rgba(0,0,0,0.03);
 }
 html[data-theme="light"] .gcal-embed-wrap {
-  border-color: rgba(0,0,0,0.08);
-  box-shadow: 0 24px 60px rgba(0,0,0,0.1);
+  border-color: rgba(0,0,0,0.1);
 }
-html[data-theme="light"] .gcal-divider-line {
-  background: linear-gradient(90deg, transparent, rgba(0,0,0,0.08), transparent);
-}
-html[data-theme="light"] .gcal-embed-inner { background: #f8f8fb; }
 
 /* ================================================================
    FINAL VISUAL FIXES
@@ -3367,19 +3316,3 @@ html[data-theme="light"] #nav .nav-dropdown .dd-dash {
   letter-spacing: 0.35em !important;
 }
 
-
-/* ── COUNTDOWN LIVE BUTTON ───────────────────────────────────── */
-#cd-live-btn-wrap {
-  animation: cdLiveFade 0.6s var(--ease) forwards;
-}
-@keyframes cdLiveFade {
-  from { opacity: 0; transform: translateY(8px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-
-/* ── EVT CARD META LOC ───────────────────────────────────────── */
-.evt-card-meta-loc {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.3rem;
-}

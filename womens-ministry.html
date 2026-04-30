@@ -21,6 +21,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="icon" type="image/png" href="https://lh3.googleusercontent.com/d/1vhiwXZNViO4mbnkXF1VzT7mFLdoLwfUL">
   <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="mobile-enhancements.css">
 </head>
 <body>
 
@@ -236,29 +237,18 @@
   </section>
 
   <!-- ── EVENTS ────────────────────────────────────────────────── -->
-  <section class="evt-section" data-label="Events" id="events" aria-label="Women's Ministry upcoming events">
-    <div class="evt-header container">
-      <div>
-        <span class="eyebrow reveal">Upcoming</span>
-        <h2 class="section-title reveal stagger-1" style="color:#fff;">Women's Events</h2>
+  <section class="section-dark section-pad" id="events" aria-label="Women's Ministry events">
+    <div class="container">
+      <div style="display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:3rem;flex-wrap:wrap;gap:1rem;">
+        <div>
+          <span class="eyebrow reveal">Upcoming</span>
+          <h2 class="section-title reveal stagger-1" style="color:#fff;">Women's Events</h2>
+        </div>
       </div>
-      <div class="evt-nav" aria-label="Carousel controls">
-        <button class="evt-arrow" id="evt-prev" aria-label="Previous events">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
-        </button>
-        <button class="evt-arrow" id="evt-next" aria-label="Next events">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 12h14M12 19l7-7-7-7"/></svg>
-        </button>
+      <div id="events-container" class="reveal stagger-2">
+        <div style="text-align:center;padding:3rem;color:rgba(255,255,255,0.35);font-size:0.85rem;">Loading events…</div>
       </div>
     </div>
-    <div class="evt-track-wrap">
-      <div class="evt-track" id="events-container">
-        <div class="evt-skeleton"></div>
-        <div class="evt-skeleton"></div>
-        <div class="evt-skeleton"></div>
-      </div>
-    </div>
-    <div class="evt-dots" id="evt-dots" aria-label="Carousel position indicators"></div>
   </section>
 
 
@@ -373,7 +363,7 @@
       const t = (ev.title + ' ' + ev.description).toLowerCase();
       return t.includes('women') || t.includes("women's") || t.includes('becoming her') || t.includes('beauty') || t.includes('grace');
     };
-    fetchAndRenderEvents('events-container', womensFilter, 5);
+    fetchAndRenderEvents('events-container', womensFilter, 4);
   });
 </script>
 
