@@ -5,23 +5,31 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <meta name="theme-color" content="#080808">
   <title>Women's Ministry | Lighthouse Church Oshawa</title>
-  <meta name="description" content="Women's Ministry at Lighthouse Church Oshawa — community, Bible study, and events for women of all ages.">
+  <meta name="description" content="Women's Ministry at Lighthouse Church Oshawa. Bible study, community events, and fellowship for women of all ages. Join us and grow together in faith.">
   <meta name="keywords" content="Women's Ministry, Lighthouse Church, Oshawa, women, Bible study, community, Beauty and Grace">
   <meta property="og:title" content="Women's Ministry | Lighthouse Church Oshawa">
-  <meta property="og:description" content="Community, Bible study, and events for women of all ages at Lighthouse Church Oshawa.">
+  <meta property="og:description" content="Women's Ministry at Lighthouse Church Oshawa. Bible study, community events, and fellowship for women of all ages. Join us and grow together in faith.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://lhcoshawa.ca/womens-ministry.html">
+  <meta property="og:locale" content="en_CA">
+  <meta property="og:site_name" content="Lighthouse Church Oshawa">
   <meta property="og:image" content="https://lh3.googleusercontent.com/d/10XjWVZGre_im94tHaI7ERDMnADVy2MtD">
   <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:creator" content="@lhcoshawa">
   <meta name="twitter:site" content="@lhcoshawa">
   <meta name="twitter:image" content="https://lh3.googleusercontent.com/d/10XjWVZGre_im94tHaI7ERDMnADVy2MtD">
+  <meta name="author" content="Lighthouse Christian Fellowship">
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://lhcoshawa.ca/womens-ministry.html">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,300;1,400;1,600&display=swap">
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,300;1,400;1,600&display=swap" rel="stylesheet">
   <link rel="icon" type="image/png" href="https://lh3.googleusercontent.com/d/1vhiwXZNViO4mbnkXF1VzT7mFLdoLwfUL">
   <link rel="stylesheet" href="styles.css">
-  <link rel="stylesheet" href="mobile-enhancements.css">
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"WebPage","url":"https://lhcoshawa.ca/womens-ministry.html","name":"Women's Ministry — Lighthouse Church Oshawa","description":"Bible study, community events, and fellowship for women of all ages at Lighthouse Church.","isPartOf":{"@type":"WebSite","url":"https://lhcoshawa.ca"}}
+  </script>
 </head>
 <body>
 
@@ -89,10 +97,10 @@
   <section class="page-hero page-hero-fade" aria-label="Women's Ministry">
     <div class="hero-video-wrap" aria-hidden="true">
       <iframe
-        src="https://drive.google.com/file/d/1VHa_N-0Cmnf1lY_r52upaHnznMp_9Te8/preview?autoplay=1&mute=1&controls=0"
-        allow="autoplay; encrypted-media; fullscreen"
+        src="https://drive.google.com/file/d/1VHa_N-0Cmnf1lY_r52upaHnznMp_9Te8/preview?mute=1&controls=0"
+        allow="encrypted-media; fullscreen"
         allowfullscreen
-        loading="eager"
+        loading="lazy"
         class="hero-video-iframe"
         title="Women's Ministry Background Video">
       </iframe>
@@ -224,8 +232,8 @@
         </div>
         <div class="reveal-right welcome-video-wrap">
           <iframe
-            src="https://drive.google.com/file/d/1VHa_N-0Cmnf1lY_r52upaHnznMp_9Te8/preview?autoplay=1&mute=1&loop=1"
-            allow="autoplay; encrypted-media"
+            src="https://drive.google.com/file/d/1VHa_N-0Cmnf1lY_r52upaHnznMp_9Te8/preview?mute=1&loop=1"
+            allow="encrypted-media"
             loading="lazy"
             class="welcome-video-iframe"
             title="Women's Ministry Video"
@@ -245,7 +253,7 @@
           <h2 class="section-title reveal stagger-1" style="color:#fff;">Women's Events</h2>
         </div>
       </div>
-      <div id="events-container" class="reveal stagger-2">
+      <div id="events-container" class="reveal stagger-2 ministry-evt-list">
         <div style="text-align:center;padding:3rem;color:rgba(255,255,255,0.35);font-size:0.85rem;">Loading events…</div>
       </div>
     </div>
@@ -367,21 +375,7 @@
   });
 </script>
 
-<script>
-  // Theme-based logo switching
-  (function() {
-    const DARK_LOGO  = "https://lh3.googleusercontent.com/d/1FlwmXedUBVWrIdYQppeLKOXL21_4LFs0";
-    const LIGHT_LOGO = "https://lh3.googleusercontent.com/d/1vhiwXZNViO4mbnkXF1VzT7mFLdoLwfUL";
-    function updateLogo() {
-      const img = document.querySelector('.nav-logo-img');
-      if (!img) return;
-      img.src = document.documentElement.getAttribute('data-theme') === 'light' ? LIGHT_LOGO : DARK_LOGO;
-    }
-    updateLogo();
-    const obs = new MutationObserver(updateLogo);
-    obs.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
-  })();
-  </script>
+
   
 </body>
 </html>

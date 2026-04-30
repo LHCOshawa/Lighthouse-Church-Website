@@ -1,9 +1,9 @@
 /* ============================================================
    LIGHTHOUSE CHURCH — GLOBAL STYLES
-   Cormorant Garamond (serif display) + Montserrat (sans UI)
+   Open Sans — unified typography across all pages
    ============================================================ */
 
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&family=Montserrat:wght@300;400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,300;1,400;1,600&display=swap');
 
 /* ── CUSTOM PROPERTIES ─────────────────────────────────────── */
 :root {
@@ -17,8 +17,8 @@
   --white:   #ffffff;
   --ease:    cubic-bezier(0.16, 1, 0.3, 1);
   --ease-2:  cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  --font-serif: 'Cormorant Garamond', Georgia, serif;
-  --font-sans:  'Montserrat', sans-serif;
+  --font-serif: 'Open Sans', sans-serif;
+  --font-sans:  'Open Sans', sans-serif;
   /* Defaults: dark mode */
   --bg:      var(--ink);
   --bg-2:    var(--ink-2);
@@ -2917,11 +2917,9 @@ body::after {
    FINAL FIXES BATCH
    ================================================================ */
 
-/* ── BOSTON BLACK = Montserrat weight 900 throughout ────────── */
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@900&display=swap');
 
 :root {
-  --font-black: 'Montserrat', sans-serif;
+  --font-black: 'Open Sans', sans-serif;
 }
 
 /* Section titles use Black weight */
@@ -3316,3 +3314,370 @@ html[data-theme="light"] #nav .nav-dropdown .dd-dash {
   letter-spacing: 0.35em !important;
 }
 
+
+/* ====================================================================
+   LIGHTHOUSE CHURCH — CONSOLIDATED FIXES & ENHANCEMENTS
+   Replaces mobile-enhancements.css — do NOT link mobile-enhancements.css
+   ==================================================================== */
+
+/* ── SAFE AREA INSETS ──────────────────────────────────────── */
+:root {
+  --safe-top:    env(safe-area-inset-top,    0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left:   env(safe-area-inset-left,   0px);
+  --safe-right:  env(safe-area-inset-right,  0px);
+}
+
+/* ── FIX: NAV HAMBURGER — visible in BOTH light & dark modes ── */
+/* Override: remove the rule that forced icons white in light mode when not scrolled.
+   The old rule "html[data-theme=light] #nav:not(.scrolled) .nav-icon-btn { color:#fff !important }"
+   is why search/toggle were invisible. We fix it here with a stronger selector. */
+html[data-theme="light"] #nav:not(.scrolled) .nav-icon-btn {
+  color: #1a1a1a !important; /* dark icons on light/transparent nav */
+}
+html[data-theme="dark"] #nav:not(.scrolled) .nav-icon-btn {
+  color: #ffffff !important; /* white icons on dark/transparent nav */
+}
+
+/* Hamburger spans — always contrasting vs background */
+.nav-hamburger {
+  color: inherit;
+  padding: 4px;
+}
+.nav-hamburger span {
+  display: block;
+  width: 22px;
+  height: 2px; /* was 1px — now clearly visible */
+  background: currentColor;
+  border-radius: 2px;
+  transition: transform 0.35s var(--ease), opacity 0.3s;
+}
+/* Dark mode nav (transparent) — white hamburger */
+html[data-theme="dark"] .nav-hamburger span { background: #ffffff; }
+/* Light mode nav (transparent) — dark hamburger */
+html[data-theme="light"] .nav-hamburger span { background: #1a1a1a; }
+/* Once scrolled, use theme text color */
+html[data-theme="light"] #nav.scrolled .nav-hamburger span { background: var(--text); }
+html[data-theme="dark"]  #nav.scrolled .nav-hamburger span { background: var(--text); }
+
+/* ── FIX: MOBILE MENU TEXT — dark text in light mode ──────── */
+html[data-theme="light"] #mobile-menu {
+  background: var(--paper) !important;
+}
+html[data-theme="light"] .mobile-nav-links a {
+  color: var(--ink) !important;
+  border-bottom-color: rgba(8,8,8,0.1) !important;
+}
+html[data-theme="light"] .mobile-nav-links a:hover {
+  color: var(--gold) !important;
+}
+html[data-theme="light"] .mobile-menu-footer {
+  border-top-color: rgba(8,8,8,0.1) !important;
+}
+
+/* Dark mode mobile menu — always white text */
+html[data-theme="dark"] #mobile-menu,
+#mobile-menu {
+  background: var(--ink);
+}
+.mobile-nav-links a {
+  color: rgba(255,255,255,0.85);
+  border-bottom-color: rgba(255,255,255,0.06);
+}
+html[data-theme="dark"] .mobile-nav-links a { color: rgba(255,255,255,0.85); }
+
+/* ── MOBILE NAV — tight spacing on small screens ───────────── */
+@media (max-width: 480px) {
+  #nav {
+    height: 64px;
+    padding-left:  calc(1.25rem + var(--safe-left));
+    padding-right: calc(1.25rem + var(--safe-right));
+  }
+  .nav-logo .logo-fallback { font-size: 0.88rem; }
+  .nav-logo img { height: 28px; }
+}
+
+/* ── ENHANCED MOBILE MENU ──────────────────────────────────── */
+#mobile-menu {
+  padding: 6rem clamp(2rem, 8vw, 4rem) calc(3rem + var(--safe-bottom));
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.mobile-nav-links {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+.mobile-nav-links a {
+  font-family: var(--font-serif);
+  font-size: clamp(1.9rem, 7vw, 3.2rem);
+  font-weight: 300;
+  letter-spacing: 0.02em;
+  padding: 0.55rem 0;
+  display: block;
+  position: relative;
+  overflow: hidden;
+  opacity: 0;
+  transform: translateX(-20px);
+  transition: color 0.25s var(--ease), padding-left 0.3s var(--ease), opacity 0.45s var(--ease), transform 0.45s var(--ease);
+}
+.mobile-nav-links a::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 2px;
+  background: var(--gold);
+  transform: scaleY(0);
+  transition: transform 0.25s var(--ease);
+}
+.mobile-nav-links a:hover { padding-left: 1rem; }
+.mobile-nav-links a:hover::before { transform: scaleY(1); }
+
+#mobile-menu.open .mobile-nav-links a {
+  opacity: 1;
+  transform: translateX(0);
+}
+/* Stagger delays */
+.mobile-nav-links a:nth-child(1) { transition-delay: 0.05s; }
+.mobile-nav-links a:nth-child(2) { transition-delay: 0.10s; }
+.mobile-nav-links a:nth-child(3) { transition-delay: 0.15s; }
+.mobile-nav-links a:nth-child(4) { transition-delay: 0.20s; }
+.mobile-nav-links a:nth-child(5) { transition-delay: 0.25s; }
+.mobile-nav-links a:nth-child(6) { transition-delay: 0.30s; }
+.mobile-nav-links a:nth-child(7) { transition-delay: 0.35s; }
+
+.mobile-menu-footer {
+  margin-top: 2.5rem;
+  padding-top: 2rem;
+  border-top: 1px solid rgba(255,255,255,0.08);
+}
+
+/* ── EVENT CARDS — new design (replaces evt-card-minimal) ─── */
+.evt-card {
+  flex-shrink: 0;
+  width: clamp(260px, 30vw, 320px);
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.4s var(--ease), box-shadow 0.4s var(--ease), border-color 0.3s;
+  cursor: default;
+}
+.evt-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 20px 50px rgba(0,0,0,0.25);
+  border-color: var(--gold);
+}
+
+.evt-card-img {
+  width: 100%;
+  height: 160px;
+  background-size: cover;
+  background-position: center;
+  background-color: var(--bg-3);
+  position: relative;
+  flex-shrink: 0;
+}
+.evt-date-badge {
+  position: absolute;
+  top: 12px; left: 12px;
+  background: rgba(0,0,0,0.75);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(201,169,110,0.4);
+  border-radius: 4px;
+  padding: 6px 10px;
+  text-align: center;
+  min-width: 48px;
+}
+.evt-badge-day {
+  display: block;
+  font-family: var(--font-serif);
+  font-size: 1.6rem;
+  font-weight: 300;
+  color: #fff;
+  line-height: 1;
+}
+.evt-badge-mon {
+  display: block;
+  font-family: var(--font-sans);
+  font-size: 0.55rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  color: var(--gold);
+  text-transform: uppercase;
+  margin-top: 2px;
+}
+.evt-card-body {
+  padding: 1.25rem 1.4rem 1.5rem;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.evt-card-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+.evt-dow {
+  font-family: var(--font-sans);
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--text-2);
+}
+.evt-time-pill {
+  font-family: var(--font-sans);
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--gold);
+  background: rgba(201,169,110,0.12);
+  border: 1px solid rgba(201,169,110,0.3);
+  padding: 3px 8px;
+  border-radius: 20px;
+  text-transform: uppercase;
+}
+.evt-title {
+  font-family: var(--font-serif);
+  font-size: 1.25rem;
+  font-weight: 400;
+  color: var(--text);
+  line-height: 1.3;
+  margin: 0;
+}
+.evt-loc {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-family: var(--font-sans);
+  font-size: 0.68rem;
+  color: var(--text-2);
+}
+.evt-desc {
+  font-family: var(--font-sans);
+  font-size: 0.76rem;
+  color: var(--text-2);
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* Ministry pages — stacked list style for events */
+.ministry-evt-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+.ministry-evt-list .evt-card {
+  width: 100%;
+  flex-direction: row;
+  min-height: 130px;
+}
+.ministry-evt-list .evt-card-img {
+  width: 160px;
+  height: auto;
+  flex-shrink: 0;
+}
+.ministry-evt-list .evt-date-badge { top: 10px; left: 10px; }
+@media (max-width: 600px) {
+  .ministry-evt-list .evt-card { flex-direction: column; }
+  .ministry-evt-list .evt-card-img { width: 100%; height: 140px; }
+}
+
+/* Events empty state */
+.events-empty {
+  text-align: center;
+  padding: 4rem 2rem;
+  color: var(--text-2);
+}
+.events-empty .empty-glyph { font-size: 2rem; color: var(--gold); margin-bottom: 1rem; opacity: 0.5; }
+.events-empty h3 { font-family: var(--font-serif); font-size: 1.5rem; font-weight: 300; color: var(--text); margin-bottom: 0.75rem; }
+.events-empty p { font-size: 0.85rem; max-width: 360px; margin: 0 auto 1.5rem; line-height: 1.7; }
+
+/* ── CALENDAR LINK BUTTON (replaces iframe embed) ─────────── */
+.gcal-link-wrap {
+  display: flex;
+  justify-content: center;
+  margin-top: 2.5rem;
+  padding: 0 1rem;
+}
+.gcal-view-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+.gcal-view-btn svg { flex-shrink: 0; }
+
+/* ── MINISTRY PAGE EVENTS GRID ─────────────────────────────── */
+#events-container:not(.evt-track) {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+#events-container:not(.evt-track) .evt-card {
+  width: 100%;
+  flex-direction: row;
+}
+#events-container:not(.evt-track) .evt-card-img {
+  width: 140px;
+  min-height: 120px;
+  height: auto;
+  flex-shrink: 0;
+}
+@media (max-width: 580px) {
+  #events-container:not(.evt-track) .evt-card { flex-direction: column; }
+  #events-container:not(.evt-track) .evt-card-img { width: 100%; height: 130px; }
+}
+
+/* Preserve carousel layout for homepage */
+.evt-track .evt-card {
+  width: clamp(260px, 30vw, 320px) !important;
+  flex-direction: column !important;
+}
+.evt-track .evt-card-img {
+  width: 100% !important;
+  height: 160px !important;
+}
+
+/* ── REMOVE OLD CALENDAR EMBED CSS ────────────────────────── */
+.gcal-toggle-wrap,
+.gcal-toggle-btn,
+.gcal-embed-wrap,
+.gcal-embed-wrap iframe { display: none !important; }
+
+/* ── RIPPLE ANIMATION ──────────────────────────────────────── */
+.btn { position: relative; overflow: hidden; }
+.ripple-circle {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.2);
+  transform: scale(0);
+  animation: ripple-anim 0.55s ease-out;
+  pointer-events: none;
+}
+@keyframes ripple-anim { to { transform: scale(2.5); opacity: 0; } }
+
+/* ── FLIP ANIMATION FOR COUNTDOWN ─────────────────────────── */
+.cd-num.flipping {
+  animation: flip-num 0.35s var(--ease) both;
+}
+@keyframes flip-num {
+  0%   { opacity: 0; transform: translateY(-8px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+/* ── WOMEN'S VIDEO — no autoplay visual cue ───────────────── */
+.hero-video-iframe { pointer-events: none; }
+
+/* ── PRINT STYLES ──────────────────────────────────────────── */
+@media print {
+  #nav, #mobile-menu, #page-loader, #cursor-dot, #cursor-ring,
+  #scroll-progress, #live-sticky, .hero-video-wrap { display: none !important; }
+  body { color: #000; background: #fff; }
+}
